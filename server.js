@@ -33,7 +33,7 @@ app.use(express.favicon());
 app.use(express.logger('dev'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
-app.use(express.cookieParser('your secret here'));
+app.use(express.cookieParser('your secret here'));      // ******* SECRET HERE ******* //
 app.use(express.session());
 // static files have higher priority over server routers
 app.use(express.static(path.join(__dirname, 'public')));

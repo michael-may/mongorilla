@@ -63,6 +63,8 @@ exports.post = function (req, res) {
         }
     });
 
+    // TODO Model Validation
+
     delete attributes['_id'];
 
     // TODO skip all attributes not specified in schema

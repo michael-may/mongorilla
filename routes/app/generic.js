@@ -35,6 +35,10 @@ exports.getEdit = function (req, res) {
         return col.name === collectionName;
     });
 
+
+    // TODO add functionality to hide forms on add/edit
+    collection.backboneForms.schema.password.validators = [];
+
     res.render('app/edit-content.html', {
         title: collection.humanName,
         subtitle: 'Edit Content',

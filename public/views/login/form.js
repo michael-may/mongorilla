@@ -1,6 +1,7 @@
 define('views/login/form', [
         'third-party/ladda-bootstrap/dist/ladda.min',
-    ], function (Ladda) {
+        'third-party/jsSHA/src/sha1.js'
+    ], function (Ladda, jsSHA) {
 
     return Backbone.View.extend({
 
@@ -22,7 +23,10 @@ define('views/login/form', [
 
         submit: function (event) {
             var instance = this;
+            var hash = new jsSHA(instance.$('[name="pass"]').val(), 'TEXT').getHash('SHA-1', 'HEX');
             event.preventDefault();
+
+            //instance.$('[name="pass"]').val(hash);
             instance.laddaSubmit.start();
             $.ajax({
                     method: 'POST',
@@ -47,8 +51,8 @@ define('views/login/form', [
         signinAsGuest: function (event) {
             var instance = this;
             event.preventDefault();
-            instance.$('[name="user"]').val('guest');
-            instance.$('[name="pass"]').val('');
+            instance.$('[name="user"]').val('admin');
+            instance.$('[name="pass"]').val('123');
             instance.submit(event);
         },
 

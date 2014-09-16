@@ -34,11 +34,16 @@ MongorillaUser.getSessionUserByRoute = function (req, res) {
 
 MongorillaUser.getFromConfigByAuth = function(user, pass) {
 
-    var userData = _(global.config.users).find(function (u) {
-        return u.username === user && u.password === pass;
-    });
+    // Only allow config login if in SETUP mode
+    if(process.env.SETUP) {
+        var userData = _(global.config.users).find(function (u) {
+            return u.username === user && u.password === pass;
+        });
 
-    return userData ? new MongorillaUser(userData) : null;
+        return userData ? new MongorillaUser(userData) : null;
+    } else {
+        return false;
+    }
 
 };
 
