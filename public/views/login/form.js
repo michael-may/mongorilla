@@ -26,8 +26,10 @@ define('views/login/form', [
             var hash = new jsSHA(instance.$('[name="pass"]').val(), 'TEXT').getHash('SHA-1', 'HEX');
             event.preventDefault();
 
-            //instance.$('[name="pass"]').val(hash);
+            // TODO hash this in the serialized data so we don't flash the hash in the form
+            instance.$('[name="pass"]').val(hash);
             instance.laddaSubmit.start();
+
             $.ajax({
                     method: 'POST',
                     url: instance.$el.attr('action'),

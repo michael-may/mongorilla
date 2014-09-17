@@ -1,4 +1,6 @@
-var _ = require('underscore');
+var _ = require('underscore'),
+    jsSHA = require('jssha'),
+    crypto = require('../../helpers/crypto.js');
 
 
 var MongorillaUser = function(data) {
@@ -37,7 +39,9 @@ MongorillaUser.getFromConfigByAuth = function(user, pass) {
     // Only allow config login if in SETUP mode
     if(process.env.SETUP) {
         var userData = _(global.config.users).find(function (u) {
-            return u.username === user && u.password === pass;
+            // Generate SHA-1 sum, just for consistency with actual db logins
+            var hash = new jsSHA(u.password, 'TEXT').getHash('SHA-1', 'HEX');
+            return u.username === user && hash === pass;
         });
 
         return userData ? new MongorillaUser(userData) : null;
@@ -52,15 +56,19 @@ MongorillaUser.getFromMongoByAuth = function(user, pass, callback) {
     getModel('mongorillaUser')
         .findOne({
             $or: [
-                { username: user, password: pass },
-                { email: user, password: pass }
+                { username: user },
+                { email: user }
             ]
         })
         .populate('photo')
         .exec(function (err, userData) {
             var user;
             if (userData) {
-                user = new MongorillaUser(userData.toJSON());
+                var challenge = crypto(pass, userData.email, userData.updated);
+
+                if(challenge === userData.password) {
+                    user = new MongorillaUser(userData.toJSON());
+                }
             }
             callback.call(null, user);
         });

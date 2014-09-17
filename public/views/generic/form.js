@@ -1,5 +1,6 @@
 define('views/generic/form', [
         'third-party/ladda-bootstrap/dist/ladda.min',
+        'third-party/jsSHA/src/sha1.js',
         'third-party/bootstrap-datepicker/js/bootstrap-datepicker',
         'third-party/bs-fancyfile/js/bootstrap-fancyfile.min',
         'third-party/ckeditor/ckeditor',
@@ -13,7 +14,7 @@ define('views/generic/form', [
         'backbone-forms/editors/datepicker',
 
         'third-party/backbone-forms/distribution/templates/bootstrap3',
-    ], function (Ladda) {
+    ], function (Ladda, jsSHA) {
 
     return Backbone.View.extend({
 
@@ -122,6 +123,13 @@ define('views/generic/form', [
             var instance = this;
             var err;
             if (!(err = instance.form.validate())) {
+                // If we have a password field, hash the input
+                // TODO hash this in the serialized data so we don't flash the hash in the form
+                if(instance.collectionName == 'mongorillaUser') {
+                    var hash = new jsSHA($('[name="password"]', instance.form.$el).val(), 'TEXT').getHash('SHA-1', 'HEX');
+                    $('[name="password"]', instance.form.$el).val(hash);
+                }
+                
                 instance.laddaSubmit.start();
                 alertify.prompt('Please, enter a revision description:', function (ok, description) {
                     if (!ok) {
