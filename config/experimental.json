@@ -47,26 +47,24 @@
                         "title": "Password", 
                         "validators": ["required"], 
                         "editorAttrs": { "placeholder": "password" },
-                        "conditionals": {
-                            "page": {
-                                "edit": {
-                                    "hidden": true
-                                }
+                        "conditionals": [
+                            {
+                                "page": "edit",
+                                "remove": true
                             }
-                        }
+                        ]
                     },
                     "newpassword": {
                         "type": "Password",
                         "title": "New Password",
                         "validators": [],
                         "editorAttrs": { "placeholder": "password" },
-                        "conditionals": {
-                            "page": {
-                                "create": {
-                                    "hidden": true
-                                }
+                        "conditionals": [
+                            {
+                                "page": "create",
+                                "remove": true
                             }
-                        }
+                        ]
                     },
                     "username": {
                         "validators": [
