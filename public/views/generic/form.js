@@ -39,13 +39,47 @@ define('views/generic/form', [
                 'json!/api/' + instance.collectionName + '/' + (instance.objectId||'default'),
                 ], function (Model, Form, config, modelData) {
 
+                
+                var schema = Form.prototype.schema; // force the schema against the model one
+
+                // Filter out any fields that shouldn't be in this view
+                // Usage Example:
+                /* "password": { 
+                        "type": "Password", 
+                        "title": "Password", 
+                        "validators": ["required"], 
+                        "editorAttrs": { "placeholder": "password" },
+                        "conditionals": {
+                            "page": {
+                                "edit": {
+                                    "hidden": true
+                                }
+                            }
+                        }
+                    }
+                */
+                if( schema ) {
+                    $.each(schema, function(key, field) {
+                        console.log('field', field);
+                        if( field.conditionals && field.conditionals.page && field.conditionals.page[options.page] ) {
+                            // Check if we should remove this field
+                            if ( field.conditionals.page.edit.hidden ) {
+                                console.log(key, 'should be hidden');
+                                delete schema[key];
+                                delete config.schema[key];
+                            }
+                        }else{
+                            console.log('didnt have conditionals');
+                        }
+                    });
+                }
 
                 instance.config = config;
                 instance.model = new Model(modelData);
                 instance.form = new Form({
                     model: instance.model,
                     fieldsets: instance.config.fieldsets,
-                    schema: Form.prototype.schema // force the schema against the model one
+                    schema: schema 
                 });
 
                 $('#collection-form').html(instance.form.render().$el);
