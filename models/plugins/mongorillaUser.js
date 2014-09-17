@@ -1,15 +1,19 @@
 module.exports = function (schema, options) {
   
     schema.pre('save', function (next) {
-        var self = this;
-        var mongoose = require('mongoose');
-        var _ = require('underscore');
         var jsSHA = require('jssha');
         var crypto = require('../../helpers/crypto.js');
 
         // Update date before passing to crypto
         this.updated = new Date();
-        this.password = crypto(this.password, this.email, this.updated);
+
+        if(typeof this.newpassword !== 'undefined') {
+            this.password = crypto(this.newpassword, this.email, this.updated);
+        } else if(typeof this.password !== 'undefined') {
+            this.password = crypto(this.password, this.email, this.updated);
+        } else {
+            delete this.password;
+        }
 
         next();
     });

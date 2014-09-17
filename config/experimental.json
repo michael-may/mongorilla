@@ -54,7 +54,20 @@
                                 }
                             }
                         }
-                    }, 
+                    },
+                    "newpassword": {
+                        "type": "Password",
+                        "title": "New Password",
+                        "validators": [],
+                        "editorAttrs": { "placeholder": "password" },
+                        "conditionals": {
+                            "page": {
+                                "create": {
+                                    "hidden": true
+                                }
+                            }
+                        }
+                    },
                     "username": {
                         "validators": [
                             "required",

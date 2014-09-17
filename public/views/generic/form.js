@@ -24,9 +24,12 @@ define('views/generic/form', [
             'click .remove': 'remove',
         },
 
+        page: '',
+
         initialize: function (options) {
             var instance = this;
 
+            page = options.page;
             instance.collectionName = options.collectionName;
             instance.objectId = options.objectId;
 
@@ -60,16 +63,15 @@ define('views/generic/form', [
                 */
                 if( schema ) {
                     $.each(schema, function(key, field) {
-                        console.log('field', field);
                         if( field.conditionals && field.conditionals.page && field.conditionals.page[options.page] ) {
                             // Check if we should remove this field
-                            if ( field.conditionals.page.edit.hidden ) {
-                                console.log(key, 'should be hidden');
+                            if ( field.conditionals.page[options.page].hidden ) {
+                                // Should be hidden
                                 delete schema[key];
                                 delete config.schema[key];
                             }
                         }else{
-                            console.log('didnt have conditionals');
+                            // No conditionals
                         }
                     });
                 }
@@ -160,8 +162,13 @@ define('views/generic/form', [
                 // If we have a password field, hash the input
                 // TODO hash this in the serialized data so we don't flash the hash in the form
                 if(instance.collectionName == 'mongorillaUser') {
-                    var hash = new jsSHA($('[name="password"]', instance.form.$el).val(), 'TEXT').getHash('SHA-1', 'HEX');
-                    $('[name="password"]', instance.form.$el).val(hash);
+                    if(page == 'create') {
+                        var hash = new jsSHA($('[name="password"]', instance.form.$el).val(), 'TEXT').getHash('SHA-1', 'HEX');
+                        $('[name="password"]', instance.form.$el).val(hash);
+                    } else if(page == 'edit') {
+                        var hash = new jsSHA($('[name="newpassword"]', instance.form.$el).val(), 'TEXT').getHash('SHA-1', 'HEX');
+                        $('[name="newpassword"]', instance.form.$el).val(hash);
+                    }
                 }
                 
                 instance.laddaSubmit.start();

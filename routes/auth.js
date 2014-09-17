@@ -57,6 +57,8 @@ exports.postLogin = function(req, res){
         }
     };
 
+    // TODO enforce limits on password submission attempts
+
     if (!(mongorillaUser = MongorillaUser.getFromConfigByAuth(req.body.user, req.body.pass))) {
         MongorillaUser.getFromMongoByAuth(req.body.user, req.body.pass, callback);
     } else {
