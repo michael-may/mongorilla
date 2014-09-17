@@ -44,35 +44,106 @@ define('views/generic/form', [
 
                 
                 var schema = Form.prototype.schema; // force the schema against the model one
+                var roles = Form.prototype.userRoles;
 
-                // Filter out any fields that shouldn't be in this view
-                // Usage Example:
-                /* "password": { 
-                        "type": "Password", 
-                        "title": "Password", 
-                        "validators": ["required"], 
-                        "editorAttrs": { "placeholder": "password" },
-                        "conditionals": {
-                            "page": {
-                                "edit": {
-                                    "hidden": true
-                                }
-                            }
-                        }
-                    }
-                */
                 if( schema ) {
-                    $.each(schema, function(key, field) {
-                        if( field.conditionals && field.conditionals.page && field.conditionals.page[options.page] ) {
-                            // Check if we should remove this field
-                            if ( field.conditionals.page[options.page].hidden ) {
-                                // Should be hidden
-                                delete schema[key];
-                                delete config.schema[key];
+                    // Iterate through the schema fields to run processing
+                    $.each(schema, function(field_name, field) {
+
+                        /**
+                         * Conditionals
+                         * Change Values or remove a property based on page or role
+                         *
+                         * Example:
+                         * "password": {
+                                "type": "Select",
+                                "title": "Roles",
+                                "options": ["admin", "editor"],
+                                "conditionals": [
+                                    {
+                                        // This conditional will only work when creating an item. 'create' or 'edit'
+                                        "page": "create", 
+                                        // This conditional will only work for the roles in this array
+                                        "roles": ["admin"],
+                                        "props": {
+                                            "options": ["super_admin"]
+                                        }
+                                    }
+                                ]
                             }
-                        }else{
-                            // No conditionals
+                         */
+                        if( field.conditionals ) {
+                            $.each(field.conditionals, function(k, conditional) {
+                                var page_test = true;
+                                var role_test = false;
+
+                                // Does this conditional work on this page?
+                                if( conditional.page && conditional.page !== options.page ) {
+                                    page_test = false;
+                                }
+
+                                // Does this conditional apply to specific roles?
+                                if( conditional.roles ) {
+                                    $.each(conditional.roles, function(k2,role) {
+                                        // Test if the role is matched to our user
+                                        if(roles.indexOf(role) > -1) {
+                                            role_test = true;
+                                        }
+                                    });
+                                }else{
+                                    role_test = true;
+                                }
+
+                                // Process changes
+                                if(page_test && role_test) {
+
+                                    // Check for prop changes
+                                    var props = conditional.props;
+                                    if ( props ) {
+                                        $.each(props, function(prop, value) {
+                                            schema[field_name][prop] = value;
+                                        });
+                                    }
+
+                                    // Remove if the flag is true
+                                    if ( conditional.remove ) {
+                                        delete schema[field_name];
+                                        delete config.schema[field_name];
+                                    }
+
+                                }
+
+                            });
                         }
+
+                        /**
+                         * Permissions
+                         * Removes a field if the user isnt a role in the permissions array
+                         *
+                         * Example:
+                         * "password": { 
+                                "type": "Password", 
+                                "title": "Password",
+                                "permissions": ["admin", "editor"]
+                            }
+                         */
+                        if( field.permissions ) {
+
+                            var permissions_test = false;
+                            $.each(field.permissions, function(k2,role) {
+                                // Test if the role is matched to our user
+                                if(roles.indexOf(role) > -1) {
+                                    permissions_test = true;
+                                }
+                            });
+
+                            // Remove object if we dont have permission
+                            if(!permissions_test) {
+                                delete schema[field_name];
+                                delete config.schema[field_name];
+                            }
+                        }
+
                     });
                 }
 

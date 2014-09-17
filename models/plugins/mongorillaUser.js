@@ -9,6 +9,7 @@ module.exports = function (schema, options) {
 
         if(typeof this.newpassword !== 'undefined') {
             this.password = crypto(this.newpassword, this.email, this.updated);
+            this.newpassword = '';
         } else if(typeof this.password !== 'undefined') {
             this.password = crypto(this.password, this.email, this.updated);
         } else {
