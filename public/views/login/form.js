@@ -22,18 +22,21 @@ define('views/login/form', [
         },
 
         submit: function (event) {
-            var instance = this;
-            var hash = new jsSHA(instance.$('[name="pass"]').val(), 'TEXT').getHash('SHA-1', 'HEX');
             event.preventDefault();
 
-            // TODO hash this in the serialized data so we don't flash the hash in the form
-            instance.$('[name="pass"]').val(hash);
+            var instance = this;
+            var hash = new jsSHA(instance.$('[name="pass"]').val(), 'TEXT').getHash('SHA-1', 'HEX');
+            var data = {
+                user: instance.$('[name="user"]').val(),
+                pass: hash
+            };
+
             instance.laddaSubmit.start();
 
             $.ajax({
                     method: 'POST',
                     url: instance.$el.attr('action'),
-                    data: instance.$el.serialize()
+                    data: data
                 })
                 .success(function (data) {
                     alertify.success('<i class="glyphicon glyphicon-ok"></i> <span class="col-sm-offset-1">Welcome, <strong>' + data.user.fullname + '</strong></span>!');
