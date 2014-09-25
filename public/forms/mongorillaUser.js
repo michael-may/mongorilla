@@ -11,10 +11,6 @@ define('forms/mongorillaUser', [
 
         initialize: function () {
             var instance = this;
-
-            console.log('**********************');
-            console.log(this.schema);
-            console.log('**********************');
             
             // add custom user defined roles
             this.schema.roles.options = this.schema.roles.options.concat(

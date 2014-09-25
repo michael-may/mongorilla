@@ -1,3 +1,11 @@
+
+/*
+ * Creates and returns a salted password hash based on:
+ *   -Pre-hashed password (so we don't transmit plain-text passwords)
+ *   -User's email address
+ *   -Date string for user's last account update
+ */
+
 var jsSHA = require('jssha');
 
 module.exports = function(passwordHash, userEmail, updatedDate) {
@@ -7,7 +15,7 @@ module.exports = function(passwordHash, userEmail, updatedDate) {
 		segment4;
 
 	// Make sure our password has /actually/ been hashed
-	// just incase hashing is disabled on the front-end somehow
+	// just in case hashing is disabled on the front-end somehow
 	passwordHash = new jsSHA(passwordHash, 'TEXT').getHash('SHA-1', 'HEX');
 
 	segment1 = passwordHash.substr(0, 20);

@@ -36,7 +36,7 @@ MongorillaUser.getSessionUserByRoute = function (req, res) {
 
 MongorillaUser.getFromConfigByAuth = function(user, pass) {
 
-    // Only allow config login if in SETUP mode
+    // Only allow config file based login if in SETUP mode
     if(process.env.SETUP) {
         var userData = _(global.config.users).find(function (u) {
             // Generate SHA-1 sum, just for consistency with actual db logins
@@ -64,6 +64,7 @@ MongorillaUser.getFromMongoByAuth = function(user, pass, callback) {
         .exec(function (err, userData) {
             var user;
             if (userData) {
+            	// Generate a salted hash of the user's password for comparison
                 var challenge = crypto(pass, userData.email, userData.updated);
 
                 if(challenge === userData.password) {

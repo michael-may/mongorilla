@@ -37,6 +37,7 @@ exports.getEdit = function (req, res) {
 
 
     // TODO add functionality to hide forms on add/edit
+    // Make password NOT required on edit pages
     collection.backboneForms.schema.password.validators = [];
 
     res.render('app/edit-content.html', {

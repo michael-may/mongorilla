@@ -1,3 +1,8 @@
+/*
+ * Implements a pre-save function on the user model
+ * to salt and hash the user's password before storing
+ */
+
 module.exports = function (schema, options) {
   
     schema.pre('save', function (next) {
